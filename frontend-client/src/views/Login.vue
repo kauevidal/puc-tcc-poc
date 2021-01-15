@@ -61,8 +61,8 @@ export default {
   components: {},
   data() {
     return {
-      username: "admin@example.com",
-      password: "123456",
+      username: "",
+      password: "",
       showAlert: false,
       message: "",
     };

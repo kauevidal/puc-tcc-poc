@@ -1,6 +1,7 @@
 package com.example.sigo.admin.service;
 
 import com.example.sigo.admin.controller.UserDTO;
+import com.example.sigo.admin.model.Role;
 import com.example.sigo.admin.model.UserEntity;
 import com.example.sigo.admin.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,13 +21,17 @@ public class UserService {
         UserEntity userEntity = new UserEntity();
         userEntity.setUsername(userDTO.getUsername());
         userEntity.setPassword(bCryptPasswordEncoder.encode(userDTO.getPassword()));
-        userRepository.save(userEntity);
+        userEntity.setRole(Role.valueOf(userDTO.getRole()));
+        UserEntity save = userRepository.save(userEntity);
+
+        userDTO.setId(save.getId());
+        userDTO.setLocked(!save.isAccountNonLocked());
         return userDTO;
     }
 
     public UserDTO findUser(String username) {
         UserEntity entity = userRepository.findByUsername(username);
         return new UserDTO(entity.getId(), entity.getUsername(), null, entity.getRole().name(),
-                entity.isAccountNonLocked());
+                !entity.isAccountNonLocked());
     }
 }

@@ -15,6 +15,6 @@ public class UserDTO {
 
     private String role;
 
-    private boolean isNotLocked;
+    private boolean isLocked;
 
 }
