@@ -1,13 +1,15 @@
 <template>
   <div>
     <b-container>
-      <b-row class="text-center text-white bg-dark">
-        <b-col col-12><h1>SIGO</h1></b-col>
+      <b-row class="mt-2">
+        <b-col col-4></b-col>
+        <b-col class="text-center" col-5><h1>SIGO</h1></b-col>
+        <b-col col-4></b-col>
       </b-row>
       <b-row>
         <b-col col-12>
           <b-alert v-model="showAlert" dismissible>
-            {{ message }}
+            {{ alertMsg }}
           </b-alert></b-col
         >
       </b-row>
@@ -64,7 +66,7 @@ export default {
       username: "",
       password: "",
       showAlert: false,
-      message: "",
+      alertMsg: "",
     };
   },
   methods: {
@@ -88,14 +90,14 @@ export default {
           if (response.ok) {
             const token = response.headers.get("authorization");
             localStorage.setItem("token", token);
-            router.push({ name: "Dashboard" });
+            router.push({ name: "ProcessManagement" });
           } else {
-            this.message = "Credenciais inválidas";
+            this.alertMsg = "Credenciais inválidas";
             this.showAlert = true;
           }
         })
         .catch((error) => {
-          this.message =
+          this.alertMsg =
             "Erro ao se comunicar com o servidor. Tente novamente mais tarde. " +
             error;
           this.showAlert = true;
