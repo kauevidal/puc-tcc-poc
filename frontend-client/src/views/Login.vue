@@ -74,7 +74,7 @@ export default {
       event.preventDefault();
       this.showAlert = false;
 
-      const loginUrl = process.env.VUE_APP_ADMIN_MODULE_URL + "/login";
+      const loginUrl = process.env.VUE_APP_ADMIN_URL + "/login";
 
       const request = {
         method: "POST",

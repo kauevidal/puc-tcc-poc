@@ -2,9 +2,9 @@ version: '3.1'
 
 services:
   
-  postgres-db:
+  postgres-admin-db:
     image: postgres
-    container_name: pg-service-admin
+    container_name: pg-admin
     ports: 
       - ${ADMIN_SERVICE_DB_PORT}:5432
     restart: always
@@ -13,9 +13,38 @@ services:
       POSTGRES_PASSWORD: ${ADMIN_SERVICE_DB_PASSWORD}
       POSTGRES_DB: ${ADMIN_SERVICE_DB_SCHEMA}
     volumes:
-        - ./create-admin-db.sql:/docker-entrypoint-initdb.d/create-db.sql
+        - ./db-scripts/create-admin-db.sql:/docker-entrypoint-initdb.d/create-admin-db.sql
     networks: 
       - sigo-network
 
+  postgres-process-db:
+    image: postgres
+    container_name: pg-process
+    ports: 
+      - ${PROCESS_MANAGEMENT_SERVICE_DB_PORT}:5432
+    restart: always
+    environment:
+      POSTGRES_USER: ${PROCESS_MANAGEMENT_SERVICE_DB_USER}
+      POSTGRES_PASSWORD: ${PROCESS_MANAGEMENT_SERVICE_DB_PASSWORD}
+      POSTGRES_DB: ${PROCESS_MANAGEMENT_SERVICE_DB_SCHEMA}
+    volumes:
+        - ./db-scripts/create-process-db.sql:/docker-entrypoint-initdb.d/create-process-db.sql
+    networks: 
+      - sigo-network
+
+  postgres-standards-db:
+    image: postgres
+    container_name: pg-standards
+    ports: 
+      - ${STANDARDS_SERVICE_DB_PORT}:5432
+    restart: always
+    environment:
+      POSTGRES_USER: ${STANDARDS_SERVICE_DB_USER}
+      POSTGRES_PASSWORD: ${STANDARDS_SERVICE_DB_PASSWORD}
+      POSTGRES_DB: ${STANDARDS_SERVICE_DB_SCHEMA}
+    volumes:
+        - ./db-scripts/create-standards-db.sql:/docker-entrypoint-initdb.d/create-standards-db.sql
+    networks: 
+      - sigo-network
 networks:
   sigo-network:

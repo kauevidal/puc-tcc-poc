@@ -23,7 +23,7 @@
           <b-button
             variant="info"
             size="sm"
-            @click="changeToEditionMode(row.item)"
+            @click="edit(row.item)"
             class="mr-1"
           >
             Detalhes
@@ -83,7 +83,7 @@ export default {
     };
   },
   methods: {
-    changeToEditionMode(item) {
+    edit(item) {
       this.selectedId = item.id;
       this.isEditing = true;
     },
@@ -107,7 +107,7 @@ export default {
     },
     loadProcesses() {
       const processesUrl =
-        process.env.VUE_APP_PROCESS_MANAGEMENT_MODULE_URL + "/process";
+        process.env.VUE_APP_PROCESS_MANAGEMENT_URL + "/process";
 
       const request = {
         method: "GET",

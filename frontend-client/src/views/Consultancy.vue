@@ -28,7 +28,7 @@ export default {
   data() {
     return {
       showAlert: false,
-      message: "",
+      alertMsg: "",
     };
   },
   methods: {},
