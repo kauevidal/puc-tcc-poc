@@ -39,15 +39,41 @@
     </b-row>
 
     <!--Edição -->
-    <div v-else>
+    <div v-else class="text-center">
       <b-row>
-        <b-button v-on:click="back" variant="info" class="float-right mx-2">
-          Voltar
-        </b-button>
-        <b-button v-on:click="save" variant="success" class="float-right mx-2">
-          Salvar
-        </b-button>
-        editando processo {{ selectedId }}
+        <b-col col-12>
+          <p>Nome do Processo: {{ selectedItem.name }}</p>
+        </b-col>
+      </b-row>
+      <b-row>
+        <b-col col-12>
+          <p>Estoque Insumos: {{ selectedItem.material_status }}%</p>
+        </b-col>
+      </b-row>
+      <b-row>
+        <b-col col-12>
+          <p>Capacidade de produção: {{ selectedItem.capacity }} peças/hora</p>
+        </b-col>
+      </b-row>
+      <b-row>
+        <b-col col-12>
+          <h6>Pedidos:</h6>
+          {{ selectedItem.order }}
+        </b-col>
+      </b-row>
+       <b-row>
+        <b-col col-12>
+          <h6>Atividades:</h6>
+          {{ activities }}
+        </b-col>
+      </b-row>
+
+      <b-row class="my-2">
+        <b-col col-12>
+          <b-button v-on:click="back" variant="info" class="mx-2">
+            Voltar
+          </b-button>
+        </b-col>
       </b-row>
     </div>
   </b-container>
@@ -65,35 +91,28 @@ export default {
     return {
       showAlert: false,
       alertMsg: "",
-      selectedId: "",
+      selectedItem: {},
       isEditing: false,
       isLoading: true,
       fields: [
         { key: "id", label: "Id", sortable: true, sortDirection: "desc" },
         { key: "name", label: "Nome", sortable: true, sortDirection: "desc" },
-        {
-          key: "status",
-          label: "Status",
-          sortable: true,
-          sortDirection: "desc",
-        },
         { key: "actions", label: "Ações" },
       ],
       items: [],
+      activities: [],
     };
   },
   methods: {
     edit(item) {
-      this.selectedId = item.id;
+      this.selectedItem = item;
+      this.activities = this.loadActivities();
       this.isEditing = true;
     },
     back() {
-      this.selectedId = "";
+      this.selectedItem = {};
+      this.activities = [];
       this.isEditing = false;
-    },
-    save() {
-      this.alertMsg = "Salvo com sucesso";
-      this.showAlert = true;
     },
     getTokenPayload() {
       const token = localStorage.token.split(".");
@@ -122,8 +141,36 @@ export default {
             return;
           }
           const data = await response.json();
-          this.items = data.processes;
+          this.items = data;
           this.isLoading = false;
+        })
+        .catch((error) => {
+          this.alertMsg =
+            "Erro ao se comunicar com o servidor. Tente novamente mais tarde." +
+            error;
+          this.showAlert = true;
+        });
+    },
+    loadActivities() {
+      const processesUrl =
+        process.env.VUE_APP_PROCESS_MANAGEMENT_URL +
+        "/activity?processId=" +
+        this.selectedItem.id;
+
+      const request = {
+        method: "GET",
+        headers: this.getHeaders(),
+      };
+
+      fetch(processesUrl, request)
+        .then(async (response) => {
+          if (!response.ok) {
+            this.alertMsg = "Credenciais inválidas";
+            this.showAlert = true;
+            return;
+          }
+          const data = await response.json();
+          this.activities = data;
         })
         .catch((error) => {
           this.alertMsg =
