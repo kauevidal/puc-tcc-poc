@@ -7,5 +7,6 @@ public class ActivityDTO {
 
     private long id;
     private String name;
+    private String description;
     private ActivityStatus status;
 }

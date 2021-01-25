@@ -12,6 +12,8 @@ public class ProcessDTO {
 
     private String name;
 
+    private String status;
+
     @JsonProperty("material_status")
     private int materialStatus;
 

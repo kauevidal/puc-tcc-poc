@@ -46,5 +46,21 @@ services:
         - ./db-scripts/create-standards-db.sql:/docker-entrypoint-initdb.d/create-standards-db.sql
     networks: 
       - sigo-network
+
+  postgres-consultancy-db:
+    image: postgres
+    container_name: pg-consultancy
+    ports: 
+      - ${CONSULTANCY_SERVICE_DB_PORT}:5432
+    restart: always
+    environment:
+      POSTGRES_USER: ${CONSULTANCY_SERVICE_DB_USER}
+      POSTGRES_PASSWORD: ${CONSULTANCY_SERVICE_DB_PASSWORD}
+      POSTGRES_DB: ${CONSULTANCY_SERVICE_DB_SCHEMA}
+    volumes:
+        - ./db-scripts/create-consultancy-db.sql:/docker-entrypoint-initdb.d/create-consultancy-db.sql
+    networks: 
+      - sigo-network
+
 networks:
   sigo-network:

@@ -42,6 +42,11 @@
     <div v-else class="text-center">
       <b-row>
         <b-col col-12>
+          <h6>Resumo</h6>
+        </b-col>
+      </b-row>
+      <b-row>
+        <b-col col-12>
           <p>Nome do Processo: {{ selectedItem.name }}</p>
         </b-col>
       </b-row>
@@ -58,19 +63,43 @@
       <b-row>
         <b-col col-12>
           <h6>Pedidos:</h6>
-          {{ selectedItem.order }}
+          <b-card-group deck>
+            <b-card
+              v-for="order in selectedItem.order"
+              :key="order.id"
+              style="max-width: 20rem"
+              :sub-title="order.id.toString()"
+              class="my-1"
+            >
+              <b-card-text>Comprador: {{ order.buyer }}</b-card-text>
+              <b-card-text>Quantidade: {{ order.quantity }}</b-card-text>
+              <b-card-text> Prazo de entrega: {{ order.due_date }}</b-card-text>
+              <b-card-text></b-card-text>
+            </b-card>
+          </b-card-group>
         </b-col>
       </b-row>
-       <b-row>
+      <b-row>
         <b-col col-12>
           <h6>Atividades:</h6>
-          {{ activities }}
+          <b-card-group deck>
+            <b-card
+              v-for="activity in activities"
+              :key="activity.id"
+              style="max-width: 20rem"
+              :sub-title="activity.name.toString()"
+              class="my-1"
+            >
+              <b-card-text> Id: {{ activity.id }} </b-card-text>
+              <b-card-text> Status: {{ activity.status }}</b-card-text>
+            </b-card>
+          </b-card-group>
         </b-col>
       </b-row>
 
       <b-row class="my-2">
         <b-col col-12>
-          <b-button v-on:click="back" variant="info" class="mx-2">
+          <b-button v-on:click="back" variant="info" class="mx-2 float-left">
             Voltar
           </b-button>
         </b-col>

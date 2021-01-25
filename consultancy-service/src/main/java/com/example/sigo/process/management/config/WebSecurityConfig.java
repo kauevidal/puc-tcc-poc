@@ -1,4 +1,4 @@
-package com.example.sigo.standard.config;
+package com.example.sigo.process.management.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -47,7 +47,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         CorsConfiguration corsConfiguration = new CorsConfiguration();
         corsConfiguration.applyPermitDefaultValues();
         corsConfiguration.addAllowedMethod(HttpMethod.OPTIONS);
-        corsConfiguration.addAllowedMethod(HttpMethod.PUT);
+        corsConfiguration.addAllowedMethod(HttpMethod.POST);
         corsConfiguration.addExposedHeader("Authorization");
         source.registerCorsConfiguration("/**", corsConfiguration);
         return source;

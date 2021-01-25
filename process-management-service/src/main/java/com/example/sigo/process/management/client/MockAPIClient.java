@@ -12,7 +12,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.text.MessageFormat;
 import java.util.List;
 
 @Component
@@ -39,7 +38,7 @@ public class MockAPIClient {
                 .build()
                 .toString();
 
-        logger.info(MessageFormat.format("URL request: %s", urlRequest));
+        logger.info(String.format("URL request: %s", urlRequest));
 
         ResponseEntity<List<ProcessDTO>> response = restTemplate.exchange(urlRequest,
                 HttpMethod.GET, null, new ParameterizedTypeReference<>() {
