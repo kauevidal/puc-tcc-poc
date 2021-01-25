@@ -3,6 +3,7 @@ package com.example.sigo.standard.controller;
 import com.example.sigo.standard.service.StandardService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -15,7 +16,7 @@ public class StandardController {
     private StandardService standardService;
 
     @GetMapping
-    public List<StandardDTO> getAll() {
+    public List<StandardDTO> getAll(Authentication authentication) {
         return standardService.findAll();
     }
 

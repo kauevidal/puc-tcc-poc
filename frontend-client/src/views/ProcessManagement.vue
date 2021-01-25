@@ -52,6 +52,13 @@
       </b-row>
       <b-row>
         <b-col col-12>
+          <p>
+            Status do Processo: {{ parseProcessStatus(selectedItem.status) }}
+          </p>
+        </b-col>
+      </b-row>
+      <b-row>
+        <b-col col-12>
           <p>Estoque Insumos: {{ selectedItem.material_status }}%</p>
         </b-col>
       </b-row>
@@ -60,9 +67,11 @@
           <p>Capacidade de produção: {{ selectedItem.capacity }} peças/hora</p>
         </b-col>
       </b-row>
+      <hr />
+
       <b-row>
         <b-col col-12>
-          <h6>Pedidos:</h6>
+          <h6 class="text-left">Pedidos:</h6>
           <b-card-group deck>
             <b-card
               v-for="order in selectedItem.order"
@@ -73,15 +82,18 @@
             >
               <b-card-text>Comprador: {{ order.buyer }}</b-card-text>
               <b-card-text>Quantidade: {{ order.quantity }}</b-card-text>
-              <b-card-text> Prazo de entrega: {{ order.due_date }}</b-card-text>
-              <b-card-text></b-card-text>
+              <b-card-text>
+                Prazo de entrega: {{ order.due_date }}
+              </b-card-text>
             </b-card>
           </b-card-group>
         </b-col>
       </b-row>
+      <hr />
+
       <b-row>
         <b-col col-12>
-          <h6>Atividades:</h6>
+          <h6 class="text-left">Atividades:</h6>
           <b-card-group deck>
             <b-card
               v-for="activity in activities"
@@ -96,6 +108,28 @@
           </b-card-group>
         </b-col>
       </b-row>
+      <hr />
+
+      <b-row>
+        <b-col col-12>
+          <h6 class="text-left">Pendências de compliance:</h6>
+          <b-card
+            v-for="requirement in requirements"
+            :key="requirement.id"
+            style="max-width: 40rem"
+            :sub-title="requirement.title.toString()"
+            class="my-2"
+          >
+            <b-card-text> Id: {{ requirement.id }} </b-card-text>
+            <b-card-text>
+              Descrição: {{ requirement.description }}
+            </b-card-text>
+            <b-card-text> Status: {{ requirement.status }} </b-card-text>
+            <b-card-text> Norma: {{ requirement.standardId }} </b-card-text>
+          </b-card>
+        </b-col>
+      </b-row>
+      <hr />
 
       <b-row class="my-2">
         <b-col col-12>
@@ -130,18 +164,27 @@ export default {
       ],
       items: [],
       activities: [],
+      requirements: [],
     };
   },
   methods: {
     edit(item) {
       this.selectedItem = item;
-      this.activities = this.loadActivities();
+      this.loadActivities();
+      this.loadRequirements();
       this.isEditing = true;
     },
     back() {
       this.selectedItem = {};
       this.activities = [];
       this.isEditing = false;
+    },
+    parseProcessStatus(status) {
+      if (status === "operational") {
+        return "Operacional";
+      } else {
+        return "parado por Problemas";
+      }
     },
     getTokenPayload() {
       const token = localStorage.token.split(".");
@@ -200,6 +243,34 @@ export default {
           }
           const data = await response.json();
           this.activities = data;
+        })
+        .catch((error) => {
+          this.alertMsg =
+            "Erro ao se comunicar com o servidor. Tente novamente mais tarde." +
+            error;
+          this.showAlert = true;
+        });
+    },
+    loadRequirements() {
+      const requirementsUrl =
+        process.env.VUE_APP_CONSULTANCY_SERVICE_URL +
+        "/requirement?processId=" +
+        this.selectedItem.id;
+
+      const request = {
+        method: "GET",
+        headers: this.getHeaders(),
+      };
+
+      fetch(requirementsUrl, request)
+        .then(async (response) => {
+          if (!response.ok) {
+            this.alertMsg = "Credenciais inválidas";
+            this.showAlert = true;
+            return;
+          }
+          const data = await response.json();
+          this.requirements = data;
         })
         .catch((error) => {
           this.alertMsg =

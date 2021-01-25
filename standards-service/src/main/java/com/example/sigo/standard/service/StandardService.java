@@ -5,6 +5,7 @@ import com.example.sigo.standard.model.StandardEntity;
 import com.example.sigo.standard.repository.StandardRepository;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -22,6 +23,7 @@ public class StandardService {
         return mapDTOs(standardEntities);
     }
 
+    @PreAuthorize("hasAuthority('EMPLOYEE')")
     public StandardDTO update(StandardDTO standardDTO) {
 
         List<StandardEntity> versions = standardRepository.findByTitle(standardDTO.getTitle());

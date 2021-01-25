@@ -55,7 +55,7 @@
           <b-row>
             <b-col col-12>
               <p>
-                Nome do Processo: {{ parseProcessStatus(selectedItem.status) }}
+                Status do Processo: {{ parseProcessStatus(selectedItem.status) }}
               </p>
             </b-col>
           </b-row>
@@ -123,7 +123,7 @@
               <b-card
                 v-for="requirement in requirements"
                 :key="requirement.id"
-                style="max-width: 20rem"
+                style="max-width: 40rem"
                 :sub-title="requirement.title.toString()"
                 class="my-2"
               >
