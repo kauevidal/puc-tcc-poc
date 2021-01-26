@@ -23,6 +23,10 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.postgresql:postgresql:42.2.18'
+    implementation 'software.amazon.awssdk:sns:2.15.69'
+    implementation 'software.amazon.awssdk:sqs:2.15.69'
+    implementation 'org.json:json:20201115'
+
     compileOnly 'org.projectlombok:lombok'
 
     annotationProcessor 'org.projectlombok:lombok'
