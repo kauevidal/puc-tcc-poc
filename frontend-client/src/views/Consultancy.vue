@@ -12,7 +12,7 @@
 
     <b-row class="my-1">
       <b-col col-12 class="text-center">
-        <h4>Consultoria</h4>
+        <h4>Consultoria e Assessoria</h4>
       </b-col>
     </b-row>
 
@@ -55,7 +55,8 @@
           <b-row>
             <b-col col-12>
               <p>
-                Status do Processo: {{ parseProcessStatus(selectedItem.status) }}
+                Status do Processo:
+                {{ parseProcessStatus(selectedItem.status) }}
               </p>
             </b-col>
           </b-row>
@@ -272,16 +273,12 @@ export default {
 
       this.newRequirement.processId = this.selectedItem.id;
 
-      const request = {
-        method: "POST",
-        headers: this.getHeaders(),
-        body: JSON.stringify(this.newRequirement),
-      };
+      const body = this.newRequirement;
 
-      fetch(requirementUrl, request)
+      fetch(requirementUrl, this.getRequest("POST", body))
         .then((response) => {
           if (response.ok) {
-            this.alertMsg = "Requisito cadastrado com sucesso";
+            this.alertMsg = "Pendência cadastrada com sucesso";
             this.showAlert = true;
             this.loadRequirements();
             this.reset();
@@ -297,26 +294,22 @@ export default {
           this.showAlert = true;
         });
     },
-    getTokenPayload() {
-      const token = localStorage.token.split(".");
-      return JSON.parse(atob(token[1]));
-    },
-    getHeaders() {
+    getRequest(method, body) {
       var headers = new Headers();
       headers.append("Authorization", localStorage.token);
       headers.append("Content-Type", "application/json");
-      return headers;
+
+      return {
+        method: method,
+        headers: headers,
+        body: JSON.stringify(body),
+      };
     },
     loadProcesses() {
       const processesUrl =
         process.env.VUE_APP_PROCESS_MANAGEMENT_URL + "/process";
 
-      const request = {
-        method: "GET",
-        headers: this.getHeaders(),
-      };
-
-      fetch(processesUrl, request)
+      fetch(processesUrl, this.getRequest("GET"))
         .then(async (response) => {
           if (!response.ok) {
             this.alertMsg = "Credenciais inválidas";
@@ -340,12 +333,7 @@ export default {
         "/activity?processId=" +
         this.selectedItem.id;
 
-      const request = {
-        method: "GET",
-        headers: this.getHeaders(),
-      };
-
-      fetch(processesUrl, request)
+      fetch(processesUrl, this.getRequest("GET"))
         .then(async (response) => {
           if (!response.ok) {
             this.alertMsg = "Credenciais inválidas";
@@ -368,12 +356,7 @@ export default {
         "/requirement?processId=" +
         this.selectedItem.id;
 
-      const request = {
-        method: "GET",
-        headers: this.getHeaders(),
-      };
-
-      fetch(requirementsUrl, request)
+      fetch(requirementsUrl, this.getRequest("GET"))
         .then(async (response) => {
           if (!response.ok) {
             this.alertMsg = "Credenciais inválidas";
@@ -394,12 +377,7 @@ export default {
       const processesUrl =
         process.env.VUE_APP_STANDARDS_SERVICE_URL + "/standard";
 
-      const request = {
-        method: "GET",
-        headers: this.getHeaders(),
-      };
-
-      fetch(processesUrl, request)
+      fetch(processesUrl, this.getRequest("GET"))
         .then(async (response) => {
           if (!response.ok) {
             this.alertMsg = "Credenciais inválidas";
@@ -409,7 +387,9 @@ export default {
           const data = await response.json();
           this.standards = [];
           data.forEach((element) => {
-            this.standards.push({ value: element.id, text: element.title });
+            if (element.inUse) {
+              this.standards.push({ value: element.id, text: element.title });
+            }
           });
         })
         .catch((error) => {

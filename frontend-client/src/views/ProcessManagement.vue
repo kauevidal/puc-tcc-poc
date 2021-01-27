@@ -39,32 +39,59 @@
     </b-row>
 
     <!--Edição -->
-    <div v-else class="text-center">
+    <div v-else>
       <b-row>
-        <b-col col-12>
-          <h6>Resumo</h6>
+        <b-col col-4>
+          <b-row>
+            <b-col col-4>
+              <h6>Resumo</h6>
+            </b-col>
+          </b-row>
+          <b-row>
+            <b-col col-4>
+              <p>Nome do Processo: {{ selectedItem.name }}</p>
+            </b-col>
+          </b-row>
+          <b-row>
+            <b-col col-4>
+              <p>
+                Status do Processo:
+                {{ parseProcessStatus(selectedItem.status) }}
+              </p>
+            </b-col>
+          </b-row>
+          <b-row>
+            <b-col col-4>
+              <p>Estoque Insumos: {{ selectedItem.material_status }}%</p>
+            </b-col>
+          </b-row>
+          <b-row>
+            <b-col col-4>
+              <p>
+                Capacidade de produção: {{ selectedItem.capacity }} peças/hora
+              </p>
+            </b-col>
+          </b-row>
         </b-col>
-      </b-row>
-      <b-row>
-        <b-col col-12>
-          <p>Nome do Processo: {{ selectedItem.name }}</p>
-        </b-col>
-      </b-row>
-      <b-row>
-        <b-col col-12>
-          <p>
-            Status do Processo: {{ parseProcessStatus(selectedItem.status) }}
-          </p>
-        </b-col>
-      </b-row>
-      <b-row>
-        <b-col col-12>
-          <p>Estoque Insumos: {{ selectedItem.material_status }}%</p>
-        </b-col>
-      </b-row>
-      <b-row>
-        <b-col col-12>
-          <p>Capacidade de produção: {{ selectedItem.capacity }} peças/hora</p>
+
+        <b-col col-8>
+          <b-row>
+            <b-col col-8>
+              <h6>Atualizações Recentes de Norma Padrão</h6>
+            </b-col>
+          </b-row>
+          <b-row>
+            <b-col col-8>
+              <b-table
+                striped
+                hover
+                :items="standardUpdates"
+                :fields="standardUpdatesFields"
+                :busy="isLoading"
+              >
+              </b-table>
+            </b-col>
+          </b-row>
         </b-col>
       </b-row>
       <hr />
@@ -165,6 +192,27 @@ export default {
       items: [],
       activities: [],
       requirements: [],
+      standardUpdates: [],
+      standardUpdatesFields: [
+        {
+          key: "title",
+          label: "Título",
+          sortable: true,
+          sortDirection: "desc",
+        },
+        {
+          key: "updateDate",
+          label: "Data Alteração",
+          sortable: true,
+          sortDirection: "desc",
+        },
+        {
+          key: "publicationDate",
+          label: "Data publicação",
+          sortable: true,
+          sortDirection: "desc",
+        },
+      ],
     };
   },
   methods: {
@@ -172,11 +220,13 @@ export default {
       this.selectedItem = item;
       this.loadActivities();
       this.loadRequirements();
+      this.loadStandardsUpdates();
       this.isEditing = true;
     },
     back() {
       this.selectedItem = {};
       this.activities = [];
+      this.requirements = [];
       this.isEditing = false;
     },
     parseProcessStatus(status) {
@@ -186,26 +236,21 @@ export default {
         return "parado por Problemas";
       }
     },
-    getTokenPayload() {
-      const token = localStorage.token.split(".");
-      return JSON.parse(atob(token[1]));
-    },
-    getHeaders() {
+    getRequest(method) {
       var headers = new Headers();
       headers.append("Authorization", localStorage.token);
       headers.append("Content-Type", "application/json");
-      return headers;
+
+      return {
+        method: method,
+        headers: headers,
+      };
     },
     loadProcesses() {
       const processesUrl =
         process.env.VUE_APP_PROCESS_MANAGEMENT_URL + "/process";
 
-      const request = {
-        method: "GET",
-        headers: this.getHeaders(),
-      };
-
-      fetch(processesUrl, request)
+      fetch(processesUrl, this.getRequest("GET"))
         .then(async (response) => {
           if (!response.ok) {
             this.alertMsg = "Credenciais inválidas";
@@ -229,12 +274,7 @@ export default {
         "/activity?processId=" +
         this.selectedItem.id;
 
-      const request = {
-        method: "GET",
-        headers: this.getHeaders(),
-      };
-
-      fetch(processesUrl, request)
+      fetch(processesUrl, this.getRequest("GET"))
         .then(async (response) => {
           if (!response.ok) {
             this.alertMsg = "Credenciais inválidas";
@@ -257,12 +297,7 @@ export default {
         "/requirement?processId=" +
         this.selectedItem.id;
 
-      const request = {
-        method: "GET",
-        headers: this.getHeaders(),
-      };
-
-      fetch(requirementsUrl, request)
+      fetch(requirementsUrl, this.getRequest("GET"))
         .then(async (response) => {
           if (!response.ok) {
             this.alertMsg = "Credenciais inválidas";
@@ -278,6 +313,41 @@ export default {
             error;
           this.showAlert = true;
         });
+    },
+    loadStandardsUpdates() {
+      const requirementsUrl =
+        process.env.VUE_APP_PROCESS_MANAGEMENT_URL + "/standard-update";
+
+      fetch(requirementsUrl, this.getRequest("GET"))
+        .then(async (response) => {
+          if (!response.ok) {
+            this.alertMsg = "Credenciais inválidas";
+            this.showAlert = true;
+            return;
+          }
+          const data = await response.json();
+          this.standardUpdates = data;
+          this.standardUpdates.forEach((e) => {
+            e.updateDate = this.formatDate(e.updateDate);
+            e.publicationDate = this.formatDate(e.publicationDate);
+          });
+        })
+        .catch(() => {
+          this.alertMsg =
+            "Erro ao se comunicar com o servidor. Tente novamente mais tarde.";
+          this.showAlert = true;
+        });
+    },
+    formatDate(stringDate) {
+      var date = new Date(stringDate);
+      return (
+        date.getDate() +
+        1 +
+        "/" +
+        (date.getMonth() + 1) +
+        "/" +
+        date.getFullYear()
+      );
     },
   },
   mounted() {

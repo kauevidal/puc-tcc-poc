@@ -210,7 +210,7 @@ export default {
       return headers;
     },
     loadStandards() {
-      const processesUrl =
+      const standardsUrl =
         process.env.VUE_APP_STANDARDS_SERVICE_URL + "/standard";
 
       const request = {
@@ -218,7 +218,7 @@ export default {
         headers: this.getHeaders(),
       };
 
-      fetch(processesUrl, request)
+      fetch(standardsUrl, request)
         .then(async (response) => {
           if (!response.ok) {
             this.alertMsg = "Credenciais inválidas";
