@@ -2,11 +2,13 @@ package com.example.sigo.mock.apis.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping(produces = MediaType.APPLICATION_JSON_VALUE)
@@ -14,17 +16,35 @@ public class ProcessMockController {
 
     private final ObjectMapper mapper = new ObjectMapper();
 
+    private final Logger logger = LoggerFactory.getLogger(ProcessMockController.class);
+
+    @Value("${api.key}")
+    private String key;
+
     @GetMapping(value = "process-mock")
-    public String getAllProcesses() throws JsonProcessingException {
-        return mapper.readTree(processes).toString();
+    public ResponseEntity<String> getAllProcesses(@RequestHeader("x-api-key") String apiKey) throws JsonProcessingException {
+
+        logger.info("Getting processes");
+
+        if (!apiKey.equals(key)) {
+            return new ResponseEntity<>("", HttpStatus.UNAUTHORIZED);
+        }
+        return new ResponseEntity<>(mapper.readTree(processes).toString(), HttpStatus.OK);
     }
 
     @GetMapping(value = "activity-mock")
-    public String getActivities(@RequestParam Long processId) throws JsonProcessingException {
+    public ResponseEntity<String> getActivities(@RequestHeader("x-api-key") String apiKey, @RequestParam Long processId) throws JsonProcessingException {
+
+        logger.info("Getting activity detail");
+
+        if (!apiKey.equals(key)) {
+            return new ResponseEntity<>("", HttpStatus.UNAUTHORIZED);
+        }
+
         if (processId == 1) {
-            return mapper.readTree(activities).toString();
+            return new ResponseEntity<>(mapper.readTree(activities).toString(), HttpStatus.OK);
         } else {
-            return mapper.readTree(activities2).toString();
+            return new ResponseEntity<>(mapper.readTree(activities2).toString(), HttpStatus.OK);
         }
     }
 
