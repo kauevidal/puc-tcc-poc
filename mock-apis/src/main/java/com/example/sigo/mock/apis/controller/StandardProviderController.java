@@ -21,7 +21,7 @@ public class StandardProviderController {
 
     private final Logger logger = LoggerFactory.getLogger(StandardProviderController.class);
 
-    @Value("${api.key}")
+    @Value("${mock.api.key}")
     private String key;
 
     @GetMapping(value = "standard-provider")

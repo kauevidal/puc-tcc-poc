@@ -6,6 +6,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
@@ -30,6 +32,9 @@ public class MockAPIClient {
     @Value("${mock.api.endpoint.activity}")
     private String activityEndpoint;
 
+    @Value("${mock.api.key}")
+    private String key;
+
     public List<ProcessDTO> getAllProcess() {
 
         String urlRequest = UriComponentsBuilder.
@@ -41,7 +46,7 @@ public class MockAPIClient {
         logger.info(String.format("URL request: %s", urlRequest));
 
         ResponseEntity<List<ProcessDTO>> response = restTemplate.exchange(urlRequest,
-                HttpMethod.GET, null, new ParameterizedTypeReference<>() {
+                HttpMethod.GET, buildRequest(), new ParameterizedTypeReference<>() {
                 });
         return response.getBody();
     }
@@ -58,8 +63,14 @@ public class MockAPIClient {
         logger.info(String.format("URL request: %s", urlRequest));
 
         ResponseEntity<List<ActivityDTO>> response = restTemplate.exchange(urlRequest,
-                HttpMethod.GET, null, new ParameterizedTypeReference<>() {
+                HttpMethod.GET, buildRequest(), new ParameterizedTypeReference<>() {
                 });
         return response.getBody();
+    }
+
+    private HttpEntity<String> buildRequest() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("x-api-key", key);
+        return new HttpEntity<>(null, headers);
     }
 }

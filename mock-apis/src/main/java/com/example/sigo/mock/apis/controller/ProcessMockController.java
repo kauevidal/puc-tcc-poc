@@ -18,7 +18,7 @@ public class ProcessMockController {
 
     private final Logger logger = LoggerFactory.getLogger(ProcessMockController.class);
 
-    @Value("${api.key}")
+    @Value("${mock.api.key}")
     private String key;
 
     @GetMapping(value = "process-mock")
