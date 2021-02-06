@@ -90,7 +90,15 @@ export default {
           if (response.ok) {
             const token = response.headers.get("authorization");
             localStorage.setItem("token", token);
-            router.push({ name: "ProcessManagement" });
+
+            const payload = JSON.parse(atob(token.split(".")[1]));
+            const role = payload.authorities;
+
+            if (role === "CONSULTANT") {
+              router.push({ name: "Consultancy" });
+            } else {
+              router.push({ name: "ProcessManagement" });
+            }
           } else {
             this.alertMsg = "Credenciais inválidas";
             this.showAlert = true;
